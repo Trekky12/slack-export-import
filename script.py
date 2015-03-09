@@ -2,6 +2,7 @@ import json
 import os
 import re
 import unicodecsv
+import requests
 
 
 home_dir = os.path.dirname(os.path.abspath(__file__))
@@ -42,6 +43,14 @@ with open('import.csv', 'wb') as csvfile:
                     except KeyError:
                         continue
                     if message.get('subtype', None):
+                        #continue
+                        if 'file' in message:
+                            if 'url_download' in message['file']:
+                                r = requests.get(message['file']['url_download'])
+                                if (r.status_code == requests.codes.ok):
+                                    with open(os.path.basename( os.path.realpath(message['file']['url_download']) ), "wb") as code:
+                                        code.write(r.content)
+                                print message['file']['url_download']
                         continue
                     # text
                     text = message['text']
